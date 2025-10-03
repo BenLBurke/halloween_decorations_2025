@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🎃 Halloween Map Submissions 🎃</title>
+<title>🎃 Halloween Map of Decorations 🎃</title>
 
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
@@ -14,13 +14,13 @@ body {
   color: #fff;
   margin: 0;
   padding: 0;
-  text-align: center;
 }
 
 header {
   background-color: #000;
   border-bottom: 4px solid orange;
   padding: 20px;
+  text-align: center;
 }
 
 header h1 {
@@ -29,25 +29,44 @@ header h1 {
   text-shadow: 2px 2px #550000;
 }
 
-.form-row {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
-  flex-wrap: wrap;
+/* Drawer styling */
+#drawer {
+  position: fixed;
+  top: 0;
+  left: -300px; /* hidden */
+  width: 300px;
+  height: 100%;
+  background-color: #111;
+  border-right: 3px solid orange;
+  padding: 20px;
+  box-sizing: border-box;
+  transition: left 0.3s ease;
+  z-index: 1000;
 }
 
-input[type="text"] {
-  padding: 10px;
+#drawer.open {
+  left: 0;
+}
+
+#drawer h2 {
+  color: orange;
+  margin-top: 0;
+}
+
+#drawer input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0 15px 0;
   border: 2px solid orange;
   border-radius: 5px;
   background-color: #333;
   color: #fff;
-  width: 200px;
 }
 
-button {
-  padding: 10px 20px;
+/* Submit button inside drawer */
+#submitBtn {
+  width: 100%;
+  padding: 10px;
   background-color: orange;
   border: 2px solid #fff;
   border-radius: 5px;
@@ -57,40 +76,49 @@ button {
   transition: all 0.2s ease-in-out;
 }
 
-button:hover {
+#submitBtn:hover {
   background-color: #fff;
   color: orange;
   transform: scale(1.05);
 }
 
-p.instruction {
-  font-style: italic;
-  color: #ffb347;
+/* Drawer toggle button */
+#drawerToggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: orange;
+  color: black;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1100;
 }
 
 #map {
-  width: 90%;
-  max-width: 800px;
-  height: 500px;
-  margin: 0 auto 20px auto;
-  border: 2px solid orange;
-  border-radius: 8px;
+  width: 100%;
+  height: calc(100vh - 80px);
+  margin-top: 0;
+  z-index: 0;
 }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>🎃 Spooky Submissions 🎃</h1>
+  <h1>🎃 Halloween Map of Decorations 🎃</h1>
 </header>
 
-<p class="instruction">Fill out the form and drop a pin on the map to submit a Halloween decoration location!</p>
+<button id="drawerToggle">Add a House</button>
 
-<div class="form-row">
+<div id="drawer">
+  <h2>Submit a House</h2>
   <input id="description" type="text" placeholder="Description">
   <input id="submittedBy" type="text" placeholder="Your Name">
   <input id="address" type="text" placeholder="Address (optional)">
   <button id="submitBtn">Submit</button>
+  <p style="color: #ffb347; font-size: 0.9em; margin-top: 10px;">Click on the map to drop a pin for this house.</p>
 </div>
 
 <div id="map"></div>
@@ -99,15 +127,18 @@ p.instruction {
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 /* ==== CONFIGURATION ==== */
+const FORM_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse"; // Pending
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:json&sheet=Approved"; // Approved
 
-// Your Google Form response URL
-const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse";
-
-// Your approved Google Sheet published as JSON
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM3RukUFjWQmxH4IdIZVHO8I/gviz/tq?tqx=out:json&sheet=Approved";
+/* ==== DRAWER TOGGLE ==== */
+const drawer = document.getElementById('drawer');
+const toggleBtn = document.getElementById('drawerToggle');
+toggleBtn.addEventListener('click', () => {
+  drawer.classList.toggle('open');
+});
 
 /* ==== INITIALIZE MAP ==== */
-const map = L.map('map').setView([39.5, -98.35], 4); // Center on USA
+const map = L.map('map').setView([39.5, -98.35], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
 }).addTo(map);
@@ -123,9 +154,8 @@ map.on('click', function(e) {
 async function loadApprovedPins() {
   try {
     const response = await fetch(SHEET_URL);
-    let text = await response.text();
+    const text = await response.text();
     const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
-    
     const rows = json.table.rows;
 
     rows.forEach(row => {
@@ -166,11 +196,11 @@ document.getElementById("submitBtn").addEventListener("click", async function() 
   const lng = marker.getLatLng().lng;
 
   const formData = new FormData();
-  formData.append("entry.1642471479", description); // Description field
-  formData.append("entry.1671409061", submittedBy);  // Your Name field
-  formData.append("entry.567850449", address);      // Address field (replace with your form entry ID)
-  formData.append("entry.645736728", lat);           // Latitude field
-  formData.append("entry.418865114", lng);           // Longitude field
+  formData.append("entry.1642471479", description);
+  formData.append("entry.1671409061", submittedBy);
+  formData.append("entry.1122334455", address); // replace with your Form entry ID
+  formData.append("entry.645736728", lat);
+  formData.append("entry.418865114", lng);
 
   try {
     await fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
@@ -178,7 +208,7 @@ document.getElementById("submitBtn").addEventListener("click", async function() 
     document.getElementById("description").value = "";
     document.getElementById("submittedBy").value = "";
     document.getElementById("address").value = "";
-    map.removeLayer(marker);
+    if (marker) map.removeLayer(marker);
     marker = null;
   } catch (err) {
     console.error("Submission failed:", err);
