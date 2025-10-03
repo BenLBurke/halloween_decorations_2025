@@ -2,28 +2,24 @@
 const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwNFOd_RfX0T5NoU3pvR_Hxa6Z4GNiiJ_5G_ZG1iR2maalIG7zy_SrRWh2bWr-vDzkX/exec";
 const APPROVED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS1Y-3NoSteQyXVngyVBqFtunjvAii3Bl1b1iQdUDxtLDNZf4F6QUHXSgUCeJRv8R0Qsud0Hole2WU9/pub?gid=1228576273&single=true&output=csv";
 
-// Initialize Leaflet map
-const map = L.map("map").setView([40, -95], 4);
+// Initialize map
+const map = L.map("map").setView([40, -95], 4); // center on USA
+
+// Add tile layer
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-
-// Tile layer
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-// Store last clicked point
+// Track last clicked location
 let lastClicked = null;
 
-// Load approved locations
+// Load approved locations from sheet
 async function loadApproved() {
   try {
     const response = await fetch(APPROVED_CSV_URL);
     const text = await response.text();
+    const rows = text.split("\n").slice(1); // skip header
 
-    const rows = text.split("\n").slice(1);
     rows.forEach(row => {
       if (!row.trim()) return;
       const cols = row.split(",");
@@ -34,7 +30,8 @@ async function loadApproved() {
       const submittedBy = cols[4] || "Anonymous";
 
       if (!isNaN(lat) && !isNaN(lng)) {
-        L.marker([lat, lng]).addTo(map)
+        L.marker([lat, lng])
+          .addTo(map)
           .bindPopup(`<b>${description}</b><br/>Submitted by: ${submittedBy}`);
       }
     });
@@ -44,7 +41,7 @@ async function loadApproved() {
 }
 loadApproved();
 
-// Handle map clicks
+// Map click to drop a pin
 map.on("click", function (e) {
   lastClicked = e.latlng;
   alert("📍 Pin dropped! Now fill in the description and name, then hit Submit.");
@@ -72,7 +69,7 @@ document.getElementById("submissionForm").addEventListener("submit", async funct
   try {
     await fetch(SUBMIT_URL, {
       method: "POST",
-      mode: "no-cors",
+      mode: "no-cors",  // allows Google Apps Script to accept request
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
