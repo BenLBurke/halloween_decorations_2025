@@ -29,7 +29,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     // Your Apps Script endpoint
-    const SUBMIT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL";
+    const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwNFOd_RfX0T5NoU3pvR_Hxa6Z4GNiiJ_5G_ZG1iR2maalIG7zy_SrRWh2bWr-vDzkX/exec";
 
     // Track selected coordinates from map click
     let clickedLat = null;
@@ -129,7 +129,7 @@
     });
 
     // Load approved markers from Google Sheets
-    const APPROVED_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Approved";
+    const APPROVED_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM3RukUFjWQmxH4IdIZVHO8/gviz/tq?tqx=out:csv&sheet=Approved";
 
     fetch(APPROVED_URL)
       .then(res => res.text())
