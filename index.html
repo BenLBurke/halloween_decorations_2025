@@ -1,13 +1,24 @@
-<h1>🎃 Halloween Decorations Map</h1>
-<p>Click on the map to drop a pin and fill in details.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎃 Halloween Decorations Map</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <h1>🎃 Halloween Decorations Map</h1>
+  <p>Click on the map to drop a pin and submit a decoration location!</p>
 
-<form id="submissionForm">
-  <input type="text" id="description" placeholder="Description (e.g., Haunted house with lights)" required />
-  <input type="text" id="submittedBy" placeholder="Your name" required />
-  <button type="submit">Submit</button>
-</form>
+  <form id="submissionForm">
+    <input type="text" id="description" placeholder="Description (e.g., Haunted house with lights)" required>
+    <input type="text" id="submittedBy" placeholder="Your name" required>
+    <button type="submit">Submit</button>
+  </form>
 
-<div id="map"></div>
+  <div id="map"></div>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
