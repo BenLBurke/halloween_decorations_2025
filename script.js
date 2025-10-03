@@ -1,5 +1,5 @@
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url";
-entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
+
 document.getElementById("submitBtn").addEventListener("click", async function () {
   if (!marker) {
     alert("Please click on the map to drop a pin first!");
