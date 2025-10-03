@@ -104,7 +104,7 @@ p.instruction {
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse";
 
 // Your approved Google Sheet published as JSON
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/2PACX-1vS1Y-3NoSteQyXVngyVBqFtunjvAii3Bl1b1iQdUDxtLDNZf4F6QUHXSgUCeJRv8R0Qsud0Hole2WU9/gviz/tq?tqx=out:json";
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM3RukUFjWQmxH4IdIZVHO8I/gviz/tq?tqx=out:json&sheet=Approved";
 
 /* ==== INITIALIZE MAP ==== */
 const map = L.map('map').setView([39.5, -98.35], 4); // Center on USA
@@ -124,7 +124,8 @@ async function loadApprovedPins() {
   try {
     const response = await fetch(SHEET_URL);
     let text = await response.text();
-    const json = JSON.parse(text.substring(text.indexOf('(')+1, text.lastIndexOf(')')));
+    const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+    
     const rows = json.table.rows;
 
     rows.forEach(row => {
