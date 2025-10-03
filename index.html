@@ -1,82 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎃 Halloween Map Submissions 🎃</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎃 Halloween Map Submissions 🎃</title>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>
-    body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background-color: #1a1a1a;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-    }
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<style>
+body {
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  background-color: #1a1a1a;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
 
-    header {
-      background-color: #000;
-      border-bottom: 4px solid orange;
-      padding: 20px;
-    }
+header {
+  background-color: #000;
+  border-bottom: 4px solid orange;
+  padding: 20px;
+}
 
-    header h1 {
-      margin: 0;
-      color: orange;
-      text-shadow: 2px 2px #550000;
-    }
+header h1 {
+  margin: 0;
+  color: orange;
+  text-shadow: 2px 2px #550000;
+}
 
-    .form-row {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
+.form-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
 
-    input[type="text"] {
-      padding: 10px;
-      border: 2px solid orange;
-      border-radius: 5px;
-      background-color: #333;
-      color: #fff;
-      width: 200px;
-    }
+input[type="text"] {
+  padding: 10px;
+  border: 2px solid orange;
+  border-radius: 5px;
+  background-color: #333;
+  color: #fff;
+  width: 200px;
+}
 
-    button {
-      padding: 10px 20px;
-      background-color: orange;
-      border: 2px solid #fff;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      color: #000;
-      transition: all 0.2s ease-in-out;
-    }
+button {
+  padding: 10px 20px;
+  background-color: orange;
+  border: 2px solid #fff;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #000;
+  transition: all 0.2s ease-in-out;
+}
 
-    button:hover {
-      background-color: #fff;
-      color: orange;
-      transform: scale(1.05);
-    }
+button:hover {
+  background-color: #fff;
+  color: orange;
+  transform: scale(1.05);
+}
 
-    p.instruction {
-      font-style: italic;
-      color: #ffb347;
-    }
+p.instruction {
+  font-style: italic;
+  color: #ffb347;
+}
 
-    #map {
-      width: 90%;
-      max-width: 800px;
-      height: 400px;
-      margin: 0 auto 20px auto;
-      border: 2px solid orange;
-      border-radius: 8px;
-    }
-  </style>
+#map {
+  width: 90%;
+  max-width: 800px;
+  height: 500px;
+  margin: 0 auto 20px auto;
+  border: 2px solid orange;
+  border-radius: 8px;
+}
+</style>
 </head>
 <body>
 
@@ -98,70 +98,92 @@
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  // === REPLACE THIS WITH YOUR FORM RESPONSE URL ===
-  const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse";
-// https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url&entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
-  
-  // Initialize map
-  const map = L.map('map').setView([39.5, -98.35], 4); // Center on USA
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-  }).addTo(map);
+/* ==== CONFIGURATION ==== */
 
-  let marker = null;
+// Your Google Form response URL
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse";
 
-  // Click map to drop pin
-  map.on('click', function(e) {
-    if (marker) map.removeLayer(marker);
-    marker = L.marker(e.latlng).addTo(map);
-    marker.bindPopup("🎃 Selected location").openPopup();
-  });
+// Your approved Google Sheet published as JSON
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/2PACX-1vS1Y-3NoSteQyXVngyVBqFtunjvAii3Bl1b1iQdUDxtLDNZf4F6QUHXSgUCeJRv8R0Qsud0Hole2WU9/gviz/tq?tqx=out:json";
 
-  // Submit handler
-  document.getElementById("submitBtn").addEventListener("click", async function() {
-    const description = document.getElementById("description").value.trim();
-    const submittedBy = document.getElementById("submittedBy").value.trim();
-    const address = document.getElementById("address").value.trim();
+/* ==== INITIALIZE MAP ==== */
+const map = L.map('map').setView([39.5, -98.35], 4); // Center on USA
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+}).addTo(map);
 
-    if (!description || !submittedBy) {
-      alert("Please fill in both Description and Your Name.");
-      return;
-    }
+let marker = null;
+map.on('click', function(e) {
+  if (marker) map.removeLayer(marker);
+  marker = L.marker(e.latlng).addTo(map);
+  marker.bindPopup("🎃 Selected location").openPopup();
+});
 
-    if (!marker) {
-      alert("Please drop a pin on the map!");
-      return;
-    }
+/* ==== LOAD APPROVED PINS ==== */
+async function loadApprovedPins() {
+  try {
+    const response = await fetch(SHEET_URL);
+    let text = await response.text();
+    const json = JSON.parse(text.substring(text.indexOf('(')+1, text.lastIndexOf(')')));
+    const rows = json.table.rows;
 
-    const lat = marker.getLatLng().lat;
-    const lng = marker.getLatLng().lng;
+    rows.forEach(row => {
+      const name = row.c[1] ? row.c[1].v : "";
+      const description = row.c[2] ? row.c[2].v : "";
+      const address = row.c[3] ? row.c[3].v : "";
+      const lat = row.c[4] ? parseFloat(row.c[4].v) : null;
+      const lng = row.c[5] ? parseFloat(row.c[5].v) : null;
 
-    // === REPLACE THESE ENTRY IDs WITH YOUR FORM'S FIELD IDS ===
-    const formData = new FormData();
-    formData.append("entry.1642471479", description); // Description
-    formData.append("entry.1671409061", submittedBy); // Submitted By
-    formData.append("entry.645736728", lat);          // Latitude
-    formData.append("entry.418865114", lng);          // Longitude
-    formData.append("entry.567850449", address);          // address
+      if (lat && lng) {
+        L.marker([lat, lng]).addTo(map)
+          .bindPopup(`<b>${description}</b><br>${address}<br>Submitted by: ${name}`);
+      }
+    });
+  } catch (err) {
+    console.error("Failed to load pins:", err);
+  }
+}
 
-    try {
-      await fetch(FORM_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData
-      });
+loadApprovedPins();
 
-      alert("Submission sent! Check the Pending spreadsheet.");
-      document.getElementById("description").value = "";
-      document.getElementById("submittedBy").value = "";
-      map.removeLayer(marker);
-      marker = null;
+/* ==== SUBMIT HANDLER ==== */
+document.getElementById("submitBtn").addEventListener("click", async function() {
+  const description = document.getElementById("description").value.trim();
+  const submittedBy = document.getElementById("submittedBy").value.trim();
+  const address = document.getElementById("address").value.trim();
 
-    } catch (err) {
-      console.error("Submission failed:", err);
-      alert("Error connecting to Google Form.");
-    }
-  });
+  if (!description || !submittedBy) {
+    alert("Please fill in Description and Your Name.");
+    return;
+  }
+  if (!marker) {
+    alert("Please drop a pin on the map!");
+    return;
+  }
+
+  const lat = marker.getLatLng().lat;
+  const lng = marker.getLatLng().lng;
+
+  const formData = new FormData();
+  formData.append("entry.1642471479", description); // Description field
+  formData.append("entry.1671409061", submittedBy);  // Your Name field
+  formData.append("entry.567850449", address);      // Address field (replace with your form entry ID)
+  formData.append("entry.645736728", lat);           // Latitude field
+  formData.append("entry.418865114", lng);           // Longitude field
+
+  try {
+    await fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
+    alert("Submission sent! Check the Pending spreadsheet.");
+    document.getElementById("description").value = "";
+    document.getElementById("submittedBy").value = "";
+    document.getElementById("address").value = "";
+    map.removeLayer(marker);
+    marker = null;
+  } catch (err) {
+    console.error("Submission failed:", err);
+    alert("Error connecting to Google Form.");
+  }
+});
 </script>
 
 </body>
