@@ -89,6 +89,7 @@
 <div class="form-row">
   <input id="description" type="text" placeholder="Description">
   <input id="submittedBy" type="text" placeholder="Your Name">
+  <input id="address" type="text" placeholder="Address (optional)">
   <button id="submitBtn">Submit</button>
 </div>
 
@@ -99,7 +100,7 @@
 <script>
   // === REPLACE THIS WITH YOUR FORM RESPONSE URL ===
   const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse";
-// https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/
+// https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url&entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
   
   // Initialize map
   const map = L.map('map').setView([39.5, -98.35], 4); // Center on USA
@@ -120,6 +121,7 @@
   document.getElementById("submitBtn").addEventListener("click", async function() {
     const description = document.getElementById("description").value.trim();
     const submittedBy = document.getElementById("submittedBy").value.trim();
+    const address = document.getElementById("address").value.trim();
 
     if (!description || !submittedBy) {
       alert("Please fill in both Description and Your Name.");
@@ -140,6 +142,7 @@
     formData.append("entry.1671409061", submittedBy); // Submitted By
     formData.append("entry.645736728", lat);          // Latitude
     formData.append("entry.418865114", lng);          // Longitude
+    formData.append("entry.567850449", address);          // address
 
     try {
       await fetch(FORM_URL, {
