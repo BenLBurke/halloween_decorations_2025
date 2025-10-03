@@ -127,8 +127,9 @@ header h1 {
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 /* ==== CONFIGURATION ==== */
-const FORM_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse"; // Pending
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:json&sheet=Approved"; // Approved
+  // https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url&entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse"; // Pending
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM3RukUFjWQmxH4IdIZVHO8I/gviz/tq?tqx=out:json&sheet=Approved"; // Approved
 
 /* ==== DRAWER TOGGLE ==== */
 const drawer = document.getElementById('drawer');
@@ -204,7 +205,7 @@ document.getElementById("submitBtn").addEventListener("click", async function() 
 
   try {
     await fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
-    alert("Submission sent! Check the Pending spreadsheet.");
+    alert("Submission sent! Your pin will be added once approved.");
     document.getElementById("description").value = "";
     document.getElementById("submittedBy").value = "";
     document.getElementById("address").value = "";
