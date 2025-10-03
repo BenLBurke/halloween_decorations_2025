@@ -4,6 +4,10 @@ const APPROVED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS1Y-3
 
 // Initialize Leaflet map
 const map = L.map("map").setView([40, -95], 4);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
 
 // Tile layer
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
