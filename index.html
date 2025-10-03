@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🎃 Halloween Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 500px; width: 100%; }
+    form { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1>🎃 Halloween Decorations Map</h1>
+
+  <!-- Submission Form -->
+  <form id="submissionForm">
+    <input type="text" id="name" placeholder="Your name (optional)" />
+    <input type="text" id="description" placeholder="Description" required />
+    <input type="text" id="address" placeholder="Address" required />
+    <button type="submit">Submit Location</button>
+  </form>
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    // Your Apps Script endpoint
+    const SUBMIT_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL";
+
+    // Handle form submission
+    document.getElementById("submissionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById("name").value,
+        description: document.getElementById("description").value,
+        address: document.getElementById("address").value,
+        latitude: "", // optional, you could add geocoding later
+        longitude: ""
+      };
+
+      const response = await fetch(SUBMIT_URL, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      const result = await response.json();
+      alert("Submitted! Pending review.");
+      e.target.reset();
+    });
+
+    // Map setup
+    const map = L.map('map').setView([39.5, -98.35], 4); // Center USA
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Load approved markers from Google Sheets (CSV export link)
+    const APPROVED_URL = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:csv&sheet=Approved";
+
+    fetch(APPROVED_URL)
+      .then(res => res.text())
+      .then(csv => {
+        const rows = csv.split("\n").slice(1); // skip header
+        rows.forEach(row => {
+          const cols = row.split(",");
+          if (cols.length >= 6 && cols[4] && cols[5]) {
+            const lat = parseFloat(cols[4]);
+            const lng = parseFloat(cols[5]);
+            const desc = cols[2];
+            if (!isNaN(lat) && !isNaN(lng)) {
+              L.marker([lat, lng]).addTo(map).bindPopup(desc);
+            }
+          }
+        });
+      });
+  </script>
+</body>
+</html>
