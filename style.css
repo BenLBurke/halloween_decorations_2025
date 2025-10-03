@@ -1,20 +1,17 @@
-body {
-  margin: 0;
-  font-family: sans-serif;
-  text-align: center;
-  background: #111;
-  color: #eee;
-}
-
-h1 {
+form {
   margin: 1rem;
-  color: orange;
 }
 
-#map {
-  width: 100%;
-  height: 80vh;
-  margin: auto;
-  border: 2px solid orange;
-  border-radius: 8px;
+form input, form button {
+  padding: 0.5rem;
+  margin: 0.3rem;
+  border-radius: 5px;
+  border: 1px solid #555;
+}
+
+form button {
+  background: orange;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
 }
