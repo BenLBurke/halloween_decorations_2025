@@ -83,3 +83,25 @@ document.getElementById("submissionForm").addEventListener("submit", async funct
   }
 });
 
+let clickMarker = null;
+
+map.on("click", function (e) {
+  lastClicked = e.latlng;
+
+  // Remove previous marker if it exists
+  if (clickMarker) map.removeLayer(clickMarker);
+
+  clickMarker = L.marker([lastClicked.lat, lastClicked.lng], { draggable: true })
+    .addTo(map)
+    .bindPopup("Your selected location")
+    .openPopup();
+
+  // Update coordinates if marker dragged
+  clickMarker.on("dragend", (event) => {
+    lastClicked = event.target.getLatLng();
+  });
+
+  alert("📍 Pin dropped! Now fill in the description and name, then hit Submit.");
+});
+
+
