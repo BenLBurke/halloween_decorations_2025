@@ -77,12 +77,22 @@
           longitude: lng
         };
 
-        // Send to Google Apps Script
-        const response = await fetch(SUBMIT_URL, {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
-        });
+       // Send to Google Apps Script
+        try {
+          const response = await fetch(SUBMIT_URL, {
+            method: "POST",
+            mode: "no-cors",   // 👈 important for GAS
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+        
+          alert("Location submitted! Pending review.");
+        } catch (err) {
+          console.error(err);
+          alert("Error submitting location.");
+        }
+
+        
 
         const result = await response.json();
         alert("Submitted! Pending review.");
