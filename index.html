@@ -1,162 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>🎃 Halloween Decorations Map</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Halloween Decorations Map</title>
+  <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <style>
-    body { font-family: sans-serif; margin: 20px; }
-    #map { height: 500px; width: 100%; margin-top: 20px; }
-    form { margin: 20px 0; }
-    input, button { padding: 8px; margin: 5px; }
-  </style>
 </head>
 <body>
   <h1>🎃 Halloween Decorations Map</h1>
-  <p>Submit cool houses with decorations! Submissions are reviewed before showing up.</p>
-
-  <!-- Submission Form -->
-  <form id="submissionForm">
-    <input type="text" id="name" placeholder="Your name (optional)" />
-    <input type="text" id="description" placeholder="Description" required />
-    <input type="text" id="address" placeholder="Address (or click map)" />
-    <button type="submit">Submit Location</button>
-  </form>
-
-  <!-- Map -->
+  <p>Click on the map to drop a pin and submit a decoration location.</p>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script>
-    // Your Apps Script endpoint
-    const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwNFOd_RfX0T5NoU3pvR_Hxa6Z4GNiiJ_5G_ZG1iR2maalIG7zy_SrRWh2bWr-vDzkX/exec";
-
-    // Track selected coordinates from map click
-    let clickedLat = null;
-    let clickedLng = null;
-    let clickMarker = null;
-
-    // Handle form submission
-    document.getElementById("submissionForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const description = document.getElementById("description").value;
-      const address = document.getElementById("address").value;
-
-      let lat = null;
-      let lng = null;
-
-      try {
-        if (clickedLat && clickedLng) {
-          // Use manually clicked coords
-          lat = clickedLat;
-          lng = clickedLng;
-        } else if (address) {
-          // Geocode with OpenStreetMap Nominatim
-          const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-          const geoData = await geoRes.json();
-
-          if (geoData.length === 0) {
-            alert("Could not find that address. Please try again or drop a pin.");
-            return;
-          }
-
-          lat = geoData[0].lat;
-          lng = geoData[0].lon;
-        } else {
-          alert("Please provide an address or drop a pin on the map.");
-          return;
-        }
-
-        // Build submission payload
-        const data = {
-          name: name,
-          description: description,
-          address: address,
-          latitude: lat,
-          longitude: lng
-        };
-
-       // Send to Google Apps Script
-        try {
-          const response = await fetch(SUBMIT_URL, {
-            method: "POST",
-            mode: "no-cors",   // 👈 important for GAS
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-          });
-        
-          alert("Location submitted! Pending review.");
-        } catch (err) {
-          console.error(err);
-          alert("Error submitting location.");
-        }
-
-        
-
-        const result = await response.json();
-        alert("Submitted! Pending review.");
-        e.target.reset();
-
-        // Reset map click state
-        if (clickMarker) {
-          map.removeLayer(clickMarker);
-          clickMarker = null;
-        }
-        clickedLat = null;
-        clickedLng = null;
-
-      } catch (err) {
-        console.error(err);
-        alert("Error submitting location.");
-      }
-    });
-
-    // Map setup
-    const map = L.map('map').setView([39.5, -98.35], 4); // Center USA
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Allow user to drop pin
-    map.on('click', (e) => {
-      clickedLat = e.latlng.lat;
-      clickedLng = e.latlng.lng;
-
-      if (clickMarker) {
-        map.removeLayer(clickMarker);
-      }
-
-      clickMarker = L.marker([clickedLat, clickedLng], { draggable: true }).addTo(map)
-        .bindPopup("Your chosen location").openPopup();
-
-      // Update coordinates if marker dragged
-      clickMarker.on('dragend', (event) => {
-        const pos = event.target.getLatLng();
-        clickedLat = pos.lat;
-        clickedLng = pos.lng;
-      });
-    });
-
-    // Load approved markers from Google Sheets
-    const APPROVED_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM3RukUFjWQmxH4IdIZVHO8/gviz/tq?tqx=out:csv&sheet=Approved";
-
-    fetch(APPROVED_URL)
-      .then(res => res.text())
-      .then(csv => {
-        const rows = csv.split("\n").slice(1); // skip header
-        rows.forEach(row => {
-          const cols = row.split(",");
-          if (cols.length >= 6 && cols[4] && cols[5]) {
-            const lat = parseFloat(cols[4]);
-            const lng = parseFloat(cols[5]);
-            const desc = cols[2];
-            if (!isNaN(lat) && !isNaN(lng)) {
-              L.marker([lat, lng]).addTo(map).bindPopup(desc);
-            }
-          }
-        });
-      });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
