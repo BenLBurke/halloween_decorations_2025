@@ -168,9 +168,18 @@ const SHEET_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM
 /* ==== DRAWER TOGGLE ==== */
 const drawer = document.getElementById('drawer');
 const toggleBtn = document.getElementById('drawerToggle');
+
 toggleBtn.addEventListener('click', () => {
   drawer.classList.toggle('open');
+
+  // Change button text depending on drawer state
+  if (drawer.classList.contains('open')) {
+    toggleBtn.textContent = '✖'; // X to close
+  } else {
+    toggleBtn.textContent = 'Submit a New House'; // original text
+  }
 });
+
 
 /* ==== INIT MAP ==== */
 const map = L.map('map').setView([39.5, -98.35], 4);
@@ -210,20 +219,6 @@ async function loadApprovedPins() {
   }
 }
 loadApprovedPins();
-
-const drawer = document.getElementById('drawer');
-const toggleBtn = document.getElementById('drawerToggle');
-
-toggleBtn.addEventListener('click', () => {
-  drawer.classList.toggle('open');
-
-  // Change button text depending on drawer state
-  if (drawer.classList.contains('open')) {
-    toggleBtn.textContent = '✖'; // X to close
-  } else {
-    toggleBtn.textContent = 'Submit a New House'; // original text
-  }
-});
 
 
 /* ==== SUBMIT HANDLER ==== */
