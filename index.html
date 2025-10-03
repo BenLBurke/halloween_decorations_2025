@@ -8,6 +8,7 @@
 <!-- Leaflet CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 <style>
+/* ==== BODY & HEADER ==== */
 body {
   font-family: 'Comic Sans MS', cursive, sans-serif;
   background-color: #1a1a1a;
@@ -19,7 +20,7 @@ body {
 header {
   background-color: #000;
   border-bottom: 4px solid orange;
-  padding: 20px;
+  padding: 15px 20px;
   text-align: center;
 }
 
@@ -27,14 +28,21 @@ header h1 {
   margin: 0;
   color: orange;
   text-shadow: 2px 2px #550000;
+  font-size: 1.5em;
 }
 
-/* Drawer styling */
+header p {
+  margin: 5px 0 0 0;
+  font-size: 1em;
+  color: #ffb347;
+}
+
+/* ==== DRAWER ==== */
 #drawer {
   position: fixed;
   top: 0;
-  left: -300px; /* hidden */
-  width: 300px;
+  left: -320px;
+  width: 320px;
   height: 100%;
   background-color: #111;
   border-right: 3px solid orange;
@@ -42,6 +50,7 @@ header h1 {
   box-sizing: border-box;
   transition: left 0.3s ease;
   z-index: 1000;
+  overflow-y: auto;
 }
 
 #drawer.open {
@@ -53,6 +62,12 @@ header h1 {
   margin-top: 0;
 }
 
+#drawer p {
+  color: #ffb347;
+  font-size: 0.9em;
+}
+
+/* Input fields */
 #drawer input[type="text"] {
   width: 100%;
   padding: 8px;
@@ -63,10 +78,10 @@ header h1 {
   color: #fff;
 }
 
-/* Submit button inside drawer */
+/* Submit button */
 #submitBtn {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background-color: orange;
   border: 2px solid #fff;
   border-radius: 5px;
@@ -96,11 +111,24 @@ header h1 {
   z-index: 1100;
 }
 
+/* ==== MAP ==== */
 #map {
   width: 100%;
   height: calc(100vh - 80px);
-  margin-top: 0;
   z-index: 0;
+}
+
+/* Map overlay for instructions */
+#mapOverlay {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background-color: rgba(0,0,0,0.7);
+  padding: 10px 15px;
+  border-radius: 5px;
+  color: #ffb347;
+  font-size: 0.9em;
+  z-index: 1000;
 }
 </style>
 </head>
@@ -108,26 +136,32 @@ header h1 {
 
 <header>
   <h1>🎃 Halloween Map of Decorations 🎃</h1>
+  <p>Browse the map to find spooky houses in your area! Click a pin for details.</p>
 </header>
 
-<button id="drawerToggle">Add a House</button>
+<!-- Drawer Toggle Button -->
+<button id="drawerToggle">Submit a New House</button>
 
+<!-- Map Overlay Instructions -->
+<div id="mapOverlay">Click pins to view details. Open the left drawer to add a new house!</div>
+
+<!-- Drawer for Submission -->
 <div id="drawer">
   <h2>Submit a House</h2>
-  <input id="description" type="text" placeholder="Description">
+  <p>Drop a pin on the map, then fill out the fields below to submit.</p>
+  <input id="description" type="text" placeholder="Description (e.g. lights, spooky theme)">
   <input id="submittedBy" type="text" placeholder="Your Name">
   <input id="address" type="text" placeholder="Address (optional)">
-  <button id="submitBtn">Submit</button>
-  <p style="color: #ffb347; font-size: 0.9em; margin-top: 10px;">Click on the map to drop a pin for this house.</p>
+  <button id="submitBtn">Send Location</button>
 </div>
 
+<!-- Map -->
 <div id="map"></div>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-/* ==== CONFIGURATION ==== */
-  // https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url&entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
+/* ==== CONFIG ==== */
 const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/formResponse"; // Pending
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/1P5aKelejpBrCTV_3tycCM3RukUFjWQmxH4IdIZVHO8I/gviz/tq?tqx=out:json&sheet=Approved"; // Approved
 
@@ -138,14 +172,14 @@ toggleBtn.addEventListener('click', () => {
   drawer.classList.toggle('open');
 });
 
-/* ==== INITIALIZE MAP ==== */
+/* ==== INIT MAP ==== */
 const map = L.map('map').setView([39.5, -98.35], 4);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
 }).addTo(map);
 
 let marker = null;
-map.on('click', function(e) {
+map.on('click', e => {
   if (marker) map.removeLayer(marker);
   marker = L.marker(e.latlng).addTo(map);
   marker.bindPopup("🎃 Selected location").openPopup();
@@ -156,30 +190,29 @@ async function loadApprovedPins() {
   try {
     const response = await fetch(SHEET_URL);
     const text = await response.text();
-    const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1));
+    const json = JSON.parse(text.substring(text.indexOf('{'), text.lastIndexOf('}')+1));
     const rows = json.table.rows;
 
     rows.forEach(row => {
-      const name = row.c[1] ? row.c[1].v : "";
-      const description = row.c[2] ? row.c[2].v : "";
-      const address = row.c[3] ? row.c[3].v : "";
-      const lat = row.c[4] ? parseFloat(row.c[4].v) : null;
-      const lng = row.c[5] ? parseFloat(row.c[5].v) : null;
+      const name = row.c[1]?.v || "";
+      const description = row.c[2]?.v || "";
+      const address = row.c[3]?.v || "";
+      const lat = row.c[4]?.v ? parseFloat(row.c[4].v) : null;
+      const lng = row.c[5]?.v ? parseFloat(row.c[5].v) : null;
 
       if (lat && lng) {
         L.marker([lat, lng]).addTo(map)
           .bindPopup(`<b>${description}</b><br>${address}<br>Submitted by: ${name}`);
       }
     });
-  } catch (err) {
+  } catch(err) {
     console.error("Failed to load pins:", err);
   }
 }
-
 loadApprovedPins();
 
 /* ==== SUBMIT HANDLER ==== */
-document.getElementById("submitBtn").addEventListener("click", async function() {
+document.getElementById("submitBtn").addEventListener("click", async () => {
   const description = document.getElementById("description").value.trim();
   const submittedBy = document.getElementById("submittedBy").value.trim();
   const address = document.getElementById("address").value.trim();
@@ -189,7 +222,7 @@ document.getElementById("submitBtn").addEventListener("click", async function() 
     return;
   }
   if (!marker) {
-    alert("Please drop a pin on the map!");
+    alert("Drop a pin on the map first!");
     return;
   }
 
@@ -197,21 +230,21 @@ document.getElementById("submitBtn").addEventListener("click", async function() 
   const lng = marker.getLatLng().lng;
 
   const formData = new FormData();
-  formData.append("entry.1642471479", description);
+  formData.append("entry.1642471479", description); // replace with your Form entry IDs
   formData.append("entry.1671409061", submittedBy);
-  formData.append("entry.1122334455", address); // replace with your Form entry ID
+  formData.append("entry.567850449", address);
   formData.append("entry.645736728", lat);
   formData.append("entry.418865114", lng);
 
   try {
     await fetch(FORM_URL, { method: "POST", mode: "no-cors", body: formData });
-    alert("Submission sent! Your pin will be added once approved.");
+    alert("Location sent! Check the Pending spreadsheet.");
     document.getElementById("description").value = "";
     document.getElementById("submittedBy").value = "";
     document.getElementById("address").value = "";
-    if (marker) map.removeLayer(marker);
+    if(marker) map.removeLayer(marker);
     marker = null;
-  } catch (err) {
+  } catch(err) {
     console.error("Submission failed:", err);
     alert("Error connecting to Google Form.");
   }
