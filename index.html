@@ -1,32 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <title>🎃 Halloween Decorations Map</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Community Submissions Map</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Halloween Map Submissions</title>
+  <style>
+    #map { height: 400px; width: 100%; margin-bottom: 1em; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, textarea, button { display: block; margin: 10px 0; padding: 8px; width: 100%; max-width: 400px; }
+    label { margin-top: 15px; font-weight: bold; }
+  </style>
+  <!-- Leaflet for map -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Community Submissions Map</h1>
-  </header>
+  <h1>🎃 Halloween Decorations Map</h1>
+  <p>Click on the map to drop a pin and submit a decoration location!</p>
 
-  <div class="form-container">
-    <h2>Submit a Location</h2>
-    <label for="description">Description:</label>
-    <textarea id="description" placeholder="Enter description"></textarea>
+  <form id="submissionForm">
+    <input type="text" id="description" placeholder="Description (e.g., Haunted house with lights)" required>
+    <input type="text" id="submittedBy" placeholder="Your name" required>
+    <button type="submit">Submit</button>
+  </form>
+  <h1>Submit a Halloween Decoration Location 🎃</h1>
+  <p>Drop a pin on the map <b>OR</b> enter an address, then fill in details below.</p>
 
-    <label for="submittedBy">Submitted By:</label>
-    <input id="submittedBy" placeholder="Your name" />
-
-    <button id="submitBtn">Submit Location</button>
-    <p><em>Click on the map to drop a pin first!</em></p>
-  </div>
-
-  <div id="map"></div>
+<div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
+  <label for="address">Address (optional if you drop a pin):</label>
+  <input id="address" type="text" placeholder="123 Main St, Springfield">
+
+  <label for="description">Description:</label>
+  <textarea id="description" placeholder="Describe the decorations"></textarea>
+
+  <label for="submittedBy">Your Name:</label>
+  <input id="submittedBy" type="text" placeholder="Jane Doe">
+
+  <button id="submitBtn">Submit</button>
+
+  <script>
+    // --- CONFIG: replace these with your Form info ---
+    const FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url";
+    // https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url&entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
+    // Replace with your actual entry IDs from pre-filled link
+    const ENTRY_ADDRESS   = "entry.567850449";
+    const ENTRY_LAT       = "entry.645736728";
+    const ENTRY_LNG       = "entry.418865114";
+    const ENTRY_DESC      = "entry.1642471479";
+    const ENTRY_SUBMIT    = "entry.1671409061";
+    // -------------------------------------------------
+
+    // Map setup
+    const map = L.map("map").setView([39.5, -98.35], 4); // center on USA
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors'
+    }).addTo(map);
+
+    let marker;
+    window.selectedLat = null;
+    window.selectedLng = null;
+
+    map.on("click", (e) => {
+      const { lat, lng } = e.latlng;
+      if (marker) marker.remove();
+      marker = L.marker([lat, lng]).addTo(map);
+      window.selectedLat = lat;
+      window.selectedLng = lng;
+    });
+
+    function openPrefilledForm(description, submittedBy, address, lat, lng) {
+      const params = new URLSearchParams();
+      if (description) params.set(ENTRY_DESC, description);
+      if (submittedBy) params.set(ENTRY_SUBMIT, submittedBy);
+      if (address) params.set(ENTRY_ADDRESS, address);
+      if (lat && lng) {
+        params.set(ENTRY_LAT, lat);
+        params.set(ENTRY_LNG, lng);
+      }
+
+      const url = FORM_BASE_URL + "&" + params.toString();
+      window.open(url, "_blank"); // opens Form in new tab
+    }
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const description = document.getElementById("description").value;
+      const submittedBy = document.getElementById("submittedBy").value;
+      const address     = document.getElementById("address").value;
+
+      if (!description || !submittedBy) {
+        alert("Please fill in description and your name!");
+        return;
+      }
+
+      if (!(address || (window.selectedLat && window.selectedLng))) {
+        alert("Please enter an address OR drop a pin on the map!");
+        return;
+      }
+
+      openPrefilledForm(description, submittedBy, address, window.selectedLat, window.selectedLng);
+    });
+  </script>
 </body>
 </html>
