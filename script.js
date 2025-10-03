@@ -1,5 +1,5 @@
 // Replace this with your Google Apps Script Web App URL
-const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwNFOd_RfX0T5NoU3pvR_Hxa6Z4GNiiJ_5G_ZG1iR2maalIG7zy_SrRWh2bWr-vDzkX/exec";
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbyPokKkVl3g8wvVvwPxOmfbAmy0CSNTtFooqFIE4CIsJxwVMfiyzMp-xnIEglsbhCo3/exec";
 const APPROVED_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS1Y-3NoSteQyXVngyVBqFtunjvAii3Bl1b1iQdUDxtLDNZf4F6QUHXSgUCeJRv8R0Qsud0Hole2WU9/pub?gid=1228576273&single=true&output=csv";
 
 // Initialize map
