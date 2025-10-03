@@ -2,110 +2,161 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🎃 Halloween Decorations Map</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Halloween Map Submissions</title>
-  <style>
-    #map { height: 400px; width: 100%; margin-bottom: 1em; }
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    input, textarea, button { display: block; margin: 10px 0; padding: 8px; width: 100%; max-width: 400px; }
-    label { margin-top: 15px; font-weight: bold; }
-  </style>
-  <!-- Leaflet for map -->
+  <title>🎃 Halloween Map Submissions 🎃</title>
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #1a1a1a;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    header {
+      background-color: #000;
+      border-bottom: 4px solid orange;
+      padding: 20px;
+    }
+
+    header h1 {
+      margin: 0;
+      color: orange;
+      text-shadow: 2px 2px #550000;
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border: 2px solid orange;
+      border-radius: 5px;
+      background-color: #333;
+      color: #fff;
+      width: 200px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: orange;
+      border: 2px solid #fff;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #000;
+      transition: all 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background-color: #fff;
+      color: orange;
+      transform: scale(1.05);
+    }
+
+    p.instruction {
+      font-style: italic;
+      color: #ffb347;
+    }
+
+    #map {
+      width: 90%;
+      max-width: 800px;
+      height: 400px;
+      margin: 0 auto 20px auto;
+      border: 2px solid orange;
+      border-radius: 8px;
+    }
+  </style>
 </head>
 <body>
-  <h1>🎃 Halloween Decorations Map</h1>
-  <p>Click on the map to drop a pin and submit a decoration location!</p>
 
-  <form id="submissionForm">
-    <input type="text" id="description" placeholder="Description (e.g., Haunted house with lights)" required>
-    <input type="text" id="submittedBy" placeholder="Your name" required>
-    <button type="submit">Submit</button>
-  </form>
-  <h1>Submit a Halloween Decoration Location 🎃</h1>
-  <p>Drop a pin on the map <b>OR</b> enter an address, then fill in details below.</p>
+<header>
+  <h1>🎃 Spooky Submissions 🎃</h1>
+</header>
+
+<p class="instruction">Fill out the form and drop a pin on the map to submit a Halloween decoration location!</p>
+
+<div class="form-row">
+  <input id="description" type="text" placeholder="Description">
+  <input id="submittedBy" type="text" placeholder="Your Name">
+  <button id="submitBtn">Submit</button>
+</div>
 
 <div id="map"></div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="script.js"></script>
-  <label for="address">Address (optional if you drop a pin):</label>
-  <input id="address" type="text" placeholder="123 Main St, Springfield">
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const FORM_URL = "https://docs.google.com/forms/d/e/1A5p9Qh7FO4IbEHQUbVP-Axh929GslpFjNcNJRpTJMoA/formResponse";
 
-  <label for="description">Description:</label>
-  <textarea id="description" placeholder="Describe the decorations"></textarea>
+  // Initialize map
+  const map = L.map('map').setView([39.5, -98.35], 4); // Center on USA
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+  }).addTo(map);
 
-  <label for="submittedBy">Your Name:</label>
-  <input id="submittedBy" type="text" placeholder="Jane Doe">
+  let marker = null;
 
-  <button id="submitBtn">Submit</button>
+  // Click map to drop pin
+  map.on('click', function(e) {
+    if (marker) map.removeLayer(marker);
+    marker = L.marker(e.latlng).addTo(map);
+    marker.bindPopup("🎃 Selected location").openPopup();
+  });
 
-  <script>
-    // --- CONFIG: replace these with your Form info ---
-    const FORM_BASE_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url";
-    // https://docs.google.com/forms/d/e/1FAIpQLSdgCImO8bsN1qFCY5fLMp_eDY78W65N6Imcxs_-5SSS8iZc3g/viewform?usp=pp_url&entry.1671409061=ben&entry.1642471479=downtown+waxhaw&entry.567850449=123+waxhaw&entry.645736728=123&entry.418865114=-123
-    // Replace with your actual entry IDs from pre-filled link
-    const ENTRY_ADDRESS   = "entry.567850449";
-    const ENTRY_LAT       = "entry.645736728";
-    const ENTRY_LNG       = "entry.418865114";
-    const ENTRY_DESC      = "entry.1642471479";
-    const ENTRY_SUBMIT    = "entry.1671409061";
-    // -------------------------------------------------
+  // Submit handler
+  document.getElementById("submitBtn").addEventListener("click", async function() {
+    const description = document.getElementById("description").value.trim();
+    const submittedBy = document.getElementById("submittedBy").value.trim();
 
-    // Map setup
-    const map = L.map("map").setView([39.5, -98.35], 4); // center on USA
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a> contributors'
-    }).addTo(map);
-
-    let marker;
-    window.selectedLat = null;
-    window.selectedLng = null;
-
-    map.on("click", (e) => {
-      const { lat, lng } = e.latlng;
-      if (marker) marker.remove();
-      marker = L.marker([lat, lng]).addTo(map);
-      window.selectedLat = lat;
-      window.selectedLng = lng;
-    });
-
-    function openPrefilledForm(description, submittedBy, address, lat, lng) {
-      const params = new URLSearchParams();
-      if (description) params.set(ENTRY_DESC, description);
-      if (submittedBy) params.set(ENTRY_SUBMIT, submittedBy);
-      if (address) params.set(ENTRY_ADDRESS, address);
-      if (lat && lng) {
-        params.set(ENTRY_LAT, lat);
-        params.set(ENTRY_LNG, lng);
-      }
-
-      const url = FORM_BASE_URL + "&" + params.toString();
-      window.open(url, "_blank"); // opens Form in new tab
+    if (!description || !submittedBy) {
+      alert("Please fill in both Description and Your Name.");
+      return;
     }
 
-    document.getElementById("submitBtn").addEventListener("click", () => {
-      const description = document.getElementById("description").value;
-      const submittedBy = document.getElementById("submittedBy").value;
-      const address     = document.getElementById("address").value;
+    if (!marker) {
+      alert("Please drop a pin on the map!");
+      return;
+    }
 
-      if (!description || !submittedBy) {
-        alert("Please fill in description and your name!");
-        return;
-      }
+    const lat = marker.getLatLng().lat;
+    const lng = marker.getLatLng().lng;
 
-      if (!(address || (window.selectedLat && window.selectedLng))) {
-        alert("Please enter an address OR drop a pin on the map!");
-        return;
-      }
+    const formData = new FormData();
+    formData.append("entry.1642471479", description); // Replace with your field ID
+    formData.append("entry.1671409061", submittedBy); // Replace with your field ID
+    formData.append("entry.645736728", lat);          // Replace with your field ID
+    formData.append("entry.418865114", lng);          // Replace with your field ID
 
-      openPrefilledForm(description, submittedBy, address, window.selectedLat, window.selectedLng);
-    });
-  </script>
+    try {
+      await fetch(FORM_URL, {
+        method: "POST",
+        mode: "no-cors",
+        body: formData
+      });
+
+      alert("Submission sent! Check the Pending spreadsheet.");
+      document.getElementById("description").value = "";
+      document.getElementById("submittedBy").value = "";
+      map.removeLayer(marker);
+      marker = null;
+
+    } catch (err) {
+      console.error("Submission failed:", err);
+      alert("Error connecting to Google Form.");
+    }
+  });
+</script>
+
 </body>
 </html>
